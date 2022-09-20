@@ -1,0 +1,4 @@
+<launch>
+    <arg name="environment" default="geral"/>
+    <node name="metrics_node" pkg="metrics" type="metrics" args="_dir_arq:=$(find metrics)/logs/$(arg environment)"/>
+</launch>
