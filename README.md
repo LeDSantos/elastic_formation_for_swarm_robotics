@@ -83,6 +83,12 @@ To start gazebo and rviz:
 ```sh
 roslaunch multiple_turtlebots_nav simulation_(house or columns).launch ## there are some rviz configs at src/multiple_turtlebots_nav/navigation
 ```
+
+To start the metrics:
+```sh
+roslaunch metrics metrics.launch environment:="(house or columns)" ## THIS IS OPTIONAL
+```
+
 To start central control and 3 robots:
 ```sh
 roslaunch central_control run_central_and3robots.launch
