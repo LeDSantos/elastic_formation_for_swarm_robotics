@@ -1,0 +1,18 @@
+<launch>
+  <param name="/use_sim_time" value="false"/>
+
+    <node pkg="tf" type="static_transform_publisher" name="map_to_base_link" args="0 0 0 0 0 0 /map base_link 100" />  
+
+   <node pkg="costmap_2d" type="costmap_2d_markers" name="voxel_visualizer">
+    <remap from="voxel_grid" to="costmap/voxel_grid"/>
+  </node> 
+
+  <!-- <node name="rviz" pkg="rviz" type="rviz" /> -->
+  <arg name="config_params" default="test_params.yaml" />
+    <remap from="central_control/global_costmap/costmap" to="global_costmap" />
+    <remap from="central_control/my_navfn_planner/plan" to="plan" />
+  <node pkg="central_control" type="central_control" name="central_control" >
+    <rosparam file="$(find global_planners_test)/launch/$(arg config_params)" command="load" />
+  </node>
+  
+</launch>

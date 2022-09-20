@@ -1,0 +1,8 @@
+<launch>
+    <include file="$(find central_control)/launch/copy_test.launch">
+        <!-- <arg name="config_params" value="test_params_pure_method.yaml"/> -->
+    </include>
+
+    <node name="robot1_run" pkg="move_robot" type="move_robot" args="_robot_num:=1"/>
+    <node name="robot2_run" pkg="move_robot" type="move_robot" args="_robot_num:=2"/>
+</launch>

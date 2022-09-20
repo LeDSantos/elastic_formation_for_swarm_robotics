@@ -1,0 +1,5 @@
+<launch>
+    <include file="$(find central_control)/launch/copy_test.launch">
+        <!-- <arg name="config_params" value="test_params_pure_method.yaml"/> -->
+    </include>
+</launch>
