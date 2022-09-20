@@ -1,0 +1,21 @@
+<launch>
+  <param name="/use_sim_time" value="false"/>
+    <!-- <node name="map_server_test" pkg="map_server" type="map_server" args="$(find multiple_turtlebots_nav)/worlds/small_room_map.yaml">
+        <param name="frame_id" value="map" />
+    </node> -->
+
+    <node pkg="tf" type="static_transform_publisher" name="map_to_base_link" args="0 0 0 0 0 0 /map base_link 100" />  
+
+   <node pkg="costmap_2d" type="costmap_2d_markers" name="voxel_visualizer">
+    <remap from="voxel_grid" to="costmap/voxel_grid"/>
+  </node> 
+
+  <!-- <node name="rviz" pkg="rviz" type="rviz" /> -->
+
+    <remap from="global_planners_test_node/global_costmap/costmap" to="global_costmap" />
+    <remap from="global_planners_test_node/my_navfn_planner/plan" to="plan" />
+  <node pkg="global_planners_test" type="global_planners_test" name="global_planners_test_node" >
+    <rosparam file="$(find global_planners_test)/launch/test_params.yaml" command="load" />
+  </node>
+  
+</launch>
