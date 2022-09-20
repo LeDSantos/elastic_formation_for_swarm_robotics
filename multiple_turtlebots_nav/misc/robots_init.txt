@@ -1,0 +1,10 @@
+<launch>
+  <!-- No namespace here as we will share this description.
+       Access with slash at the beginning -->
+  <arg name="model" default="waffle" doc="model type [burger, waffle, waffle_pi]"/>
+  <param name="robot_description" command="$(find xacro)/xacro $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />    
+   <!-- Run the map server -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find multiple_turtlebots_nav)/worlds/smallHallwayMarked2.yaml">
+    <param name="frame_id" value="map" />
+  </node>
+  <arg name="set_map_frame"  default="map"/> 

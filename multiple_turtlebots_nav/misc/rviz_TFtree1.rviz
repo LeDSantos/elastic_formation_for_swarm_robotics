@@ -1,0 +1,26 @@
+        robot/base_footprint:
+          Value: true
+        robot/base_link:
+          Value: true
+        robot/base_scan:
+          Value: true
+        robot/camera_depth_frame:
+          Value: true
+        robot/camera_depth_optical_frame:
+          Value: true
+        robot/camera_link:
+          Value: true
+        robot/camera_rgb_frame:
+          Value: true
+        robot/camera_rgb_optical_frame:
+          Value: true
+        robot/caster_back_left_link:
+          Value: true
+        robot/caster_back_right_link:
+          Value: true
+        robot/imu_link:
+          Value: true
+        robot/wheel_left_link:
+          Value: true
+        robot/wheel_right_link:
+          Value: true

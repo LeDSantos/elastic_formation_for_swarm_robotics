@@ -1,0 +1,26 @@
+<launch>
+    <param name="/use_sim_time" value="true" />
+    <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/room_torta_worldv2.world"/>
+        <!-- more default parameters can be changed here -->
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="true"/>
+        <arg name="headless" value="false"/>
+        <arg name="debug" value="false"/>
+    </include>  
+  
+    <!-- Run the map server -->
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find multiple_turtlebots_nav)/worlds/room_torta.yaml">
+        <param name="frame_id" value="map" />
+    </node>
+
+    <!-- include our robots -->
+    <include file="$(find multiple_turtlebots_nav)/launch/generated_robots_room3robots_room_torta.launch"/>
+
+     <!-- launch the overall visualization on rviz -->
+    <node pkg="rviz" type="rviz" name="rviz" required="true"
+          args="-d $(find multiple_turtlebots_nav)/navigation/multiple_turtlebots.rviz"/>
+
+  </launch>

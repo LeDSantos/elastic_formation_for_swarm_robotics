@@ -1,0 +1,17 @@
+<!-- BEGIN robotname-->
+  <arg name="robot_prefix" value="robotname"/> 
+  <group ns="$(arg robot_prefix)">
+    <param name="tf_prefix" value="$(arg robot_prefix)" />
+    <include file="$(find multiple_turtlebots_nav)/launch/one_robot.launch" >
+      <arg name="init_pose" value="-x xpos -y ypos -z 0" />
+      <arg name="robot_name"  value="robotname" />
+      <arg name="model" value="$(arg model)"/>
+      <arg name="set_base_frame" value="$(arg robot_prefix)/base_footprint"/>
+      <arg name="set_odom_frame" value="$(arg robot_prefix)/odom"/>
+      <arg name="set_scan_frame" value="$(arg robot_prefix)/base_scan"/>
+      <arg name="set_map_frame" value="$(arg set_map_frame)"/>
+      <arg name="initial_pose_x" default="xpos"/>
+      <arg name="initial_pose_y" default="ypos"/>
+      <arg name="initial_pose_a" default="apos"/>   
+    </include>
+  </group>
