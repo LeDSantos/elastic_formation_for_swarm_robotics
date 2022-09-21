@@ -1,0 +1,6 @@
+<launch>
+    <include file="$(find central_control)/launch/copy_test.launch"/>
+
+    <node name="robot1_run" pkg="move_robot" type="move_robot" args="_robot_num:=1 _initial_robot_x:=-1.23 _initial_robot_y:=-0.04"/>
+    <node name="robot2_run" pkg="move_robot" type="move_robot" args="_robot_num:=2 _initial_robot_x:=-1.23 _initial_robot_y:=0.695"/>
+</launch>

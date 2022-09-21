@@ -21,7 +21,8 @@ typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseCl
    “Managing coherent groups,” Computer Animation and Virtual Worlds, vol. 19, no. 3-4, pp. 295–305, 2008.*/
 // #define PURE_METHOD
 
-#define NUM_ROBOTS 3//4//2
+// CONFIG_REAL_TEST:
+#define NUM_ROBOTS 2
 
 #define INITIAL_MAP 1
 
@@ -31,13 +32,16 @@ typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseCl
 #define MAX_VEL 0.05 // constant velocity
 #endif
 
-#define MIN_DIST 0.2 // minimum distance between goal and formation center to finish the operation
+#define MIN_DIST 0.1 // minimum distance between goal and formation center to finish the operation
 
 #define INC_DIST 0.2 // turtlebot size
 
 // For callbacks
 geometry_msgs::Pose robots_position[NUM_ROBOTS+1];
 nav_msgs::OccupancyGrid global_costmap_recevied, map_recevied;
+
+// CONFIG_REAL_TEST:
+float initial_robot_x_y[NUM_ROBOTS][2] = {{-1.23, -0.04},{-1.23, 0.695}};
 
 // For size
 float map_resolution_, global_map_resolution_;
@@ -196,6 +200,8 @@ std::tuple<int, int> vectorIndexToMatrixIndices(int index) {
 
 void robot_odom_callback(const nav_msgs::Odometry::ConstPtr& msg, int n_robot){
 	robots_position[n_robot] = msg->pose.pose;
+  robots_position[n_robot].position.x += initial_robot_x_y[n_robot - 1][0];
+  robots_position[n_robot].position.y += initial_robot_x_y[n_robot - 1][1];
 }
 
 void map_callback(const nav_msgs::OccupancyGrid& msg){
@@ -333,23 +339,23 @@ void global_costmap_callback(const nav_msgs::OccupancyGrid& msg){
     local_v[0] = pot_parameter_v_current[robot_num-1][0] - (intermediate_goal.position.x - formation_center.position.x);
     local_v[1] = pot_parameter_v_current[robot_num-1][1] - (intermediate_goal.position.y - formation_center.position.y);
 
-    for (int j = smallest_global_j_; j <= largest_global_j_; ++j) {
-      for (int i = smallest_global_i_; i <= largest_global_i_; ++i) {
-        int map_index = i + j * global_map_width_;
+      for (int j = smallest_global_j_; j <= largest_global_j_; ++j) {
+        for (int i = smallest_global_i_; i <= largest_global_i_; ++i) {
+            int map_index = i + j * global_map_width_;
 
-        if(global_map_[robot_num][map_index].BOUNDARY_CONDITION == false){
-          left  = global_map_[robot_num][map_index-1].POTENTIAL;
-          right = global_map_[robot_num][map_index+1].POTENTIAL;
-          up    = global_map_[robot_num][map_index+global_map_width_].POTENTIAL;
-          down  = global_map_[robot_num][map_index-global_map_width_].POTENTIAL;
+            if(global_map_[robot_num][map_index].BOUNDARY_CONDITION == false){
+              left  = global_map_[robot_num][map_index-1].POTENTIAL;
+              right = global_map_[robot_num][map_index+1].POTENTIAL;
+              up    = global_map_[robot_num][map_index+global_map_width_].POTENTIAL;
+              down  = global_map_[robot_num][map_index-global_map_width_].POTENTIAL;
 
-          global_map_[robot_num][map_index].POTENTIAL = (left + right + up + down)/4.0
-                                                      + (pot_parameter_e[robot_num-1]/8.0)*
+              global_map_[robot_num][map_index].POTENTIAL = (left + right + up + down)/4.0
+                                                            + (pot_parameter_e[robot_num-1]/8.0)*
                                                                 (local_v[0]*(right - left)
                                                                  + local_v[1]*(up - down));
+            }
         }
       }
-    }
 
   }
 
@@ -502,13 +508,16 @@ void Control::FirstMoveFormation(navfn::NavfnROS *planner){
   start.header.frame_id = "map";
   start.header.stamp=ros::Time::now();
 
+  do{
   planner->makePlan(start, goal, plan);
 
   if(plan.size() < 1){
     ROS_WARN("plan size %ld, WITHOUT path to   x: %f   y: %f", plan.size(), goal.pose.position.x, goal.pose.position.y);
-  }else{
+    }else{
     ROS_WARN("plan size %ld, path to   x: %f   y: %f", plan.size(), goal.pose.position.x, goal.pose.position.y);
-  }
+    }
+  }while (plan.size() < 1 && ros::ok());
+  
 
   float real_distance;
   int cell_distance = dist_intermediate_center/global_map_resolution_;
@@ -547,7 +556,15 @@ void Control::MoveFormation(navfn::NavfnROS *planner){
   start.header.frame_id = "map";
   start.header.stamp=ros::Time::now();
 
+  // do{
   planner->makePlan(start, goal, plan);
+
+  if(plan.size() < 1){
+    ROS_WARN("plan size %ld, WITHOUT path to   x: %f   y: %f", plan.size(), goal.pose.position.x, goal.pose.position.y);
+  }else{
+    ROS_WARN("plan size %ld, path to   x: %f   y: %f", plan.size(), goal.pose.position.x, goal.pose.position.y);
+  }
+  // }while (plan.size() < 1 && ros::ok());
 
   bool stop = false;
   #ifndef PURE_METHOD
@@ -627,7 +644,7 @@ void Control::CalculateVparamCurrent(){
   bool obst = false;
 
   for(int robot_num = INITIAL_MAP; robot_num <= NUM_ROBOTS; robot_num++){
-
+    
     #ifndef PURE_METHOD
     // Elastic form
     obst = false;
@@ -650,7 +667,7 @@ void Control::CalculateVparamCurrent(){
 
     if(test_dist > initial_pot_parameter_v_dist_ang[robot_num-1][0])
       test_dist = initial_pot_parameter_v_dist_ang[robot_num-1][0];
-    
+
     #else
       test_dist = initial_pot_parameter_v_dist_ang[robot_num-1][0];
     #endif
@@ -709,8 +726,8 @@ void Control::SetGoalPosition(float x, float y, float z, float ang){
   goal.header.frame_id = "map";
   goal.header.stamp = ros::Time::now();
 
-  goal.pose.position.x += dist_intermediate_center * cos(formation_ang_final);
-  goal.pose.position.y += dist_intermediate_center * sin(formation_ang_final);
+  // goal.pose.position.x += dist_intermediate_center * cos(formation_ang_final);
+  // goal.pose.position.y += dist_intermediate_center * sin(formation_ang_final);
 
   ROS_WARN("FINAL GOAL x: %f   y: %f  angle: %f", goal.pose.position.x, goal.pose.position.y, formation_ang_final);
 
@@ -746,11 +763,11 @@ geometry_msgs::PoseStamped Control::CalculateRobotIdealPoseOnFormation(int robot
   return (robot_on_formation[robot_num]);
 }
 
-///////////////////////////////////
-/////                         /////
-/////      MAIN FUNCTION      /////
-/////                         /////
-///////////////////////////////////
+  ///////////////////////////////////
+  /////                         /////
+  /////      MAIN FUNCTION      /////
+  /////                         /////
+  ///////////////////////////////////
 
 // Principal execution
 int main(int argc, char** argv){
@@ -836,17 +853,11 @@ int main(int argc, char** argv){
 
   // Start algoritm
 
-  float e[NUM_ROBOTS] = {-0.4, -0.4, -0.4};
-                        // {-0.4, -0.4, -0.4, -0.4};
-                        // {-0.4, -0.4};
 
-  float v[NUM_ROBOTS][2] = {{0.75,  1.0}, {-0.75,  1.0},  {0.0, -1.0}};
-                          // {{0.75,  0.75}, {-0.75, 0.75}, {0.75,  -0.75}, {-0.75, -0.75}};
-                          // {{0.5,  0.5}, {-0.5, 0.5}, {0.5,  -0.5}, {-0.5, -0.5}};
-                          //{{0.0,  1.0}, {0.0, -1.0}};
-                        
-
-  float formation_side = 4.0;
+  // CONFIG_REAL_TEST: 2 ROBOTS
+  float e[NUM_ROBOTS] = {-0.4, -0.4};
+  float v[NUM_ROBOTS][2] = {{0.0, -0.5}, {0.0, 0.5}};
+  float formation_side = 3.0;
 
   Control central_control(formation_side, e, v);
 
@@ -854,10 +865,10 @@ int main(int argc, char** argv){
   finished_operation_pub.publish(central_control.finished_msg);
 
   // House
-  central_control.SetInitialStartPosition(-4, 1, 0 , 0);
-  // central_control.SetGoalPosition(-2.5, 1, 0, 0);
-  central_control.SetGoalPosition(-4.95, 3.2, 0, 3.14);
-  // central_control.SetGoalPosition(-1, 1, 0, 0);
+  // central_control.SetInitialStartPosition(-4, 1, 0 , 0);
+  // // central_control.SetGoalPosition(-2.5, 1, 0, 0);
+  // central_control.SetGoalPosition(-4.95, 3.2, 0, 3.14);
+  // // central_control.SetGoalPosition(-1, 1, 0, 0);
 
   // // Ampulheta
   // central_control.SetInitialStartPosition(1.0, -6.0, 0.0, 1.57);
@@ -868,13 +879,17 @@ int main(int argc, char** argv){
   // central_control.SetInitialStartPosition(-1.5, -1.0, 0.0, 1.57);
   // central_control.SetGoalPosition(-3.0, 5.3, 0.0, 1.57);
 
+  // CONFIG_REAL_TEST:
+  central_control.SetInitialStartPosition(-1.23, 0.35, 0.0, 0.0);
+  central_control.SetGoalPosition( 1.85, -0.99, 0.0, 0.0);
+
   initial_time = ros::Time::now();
 
   init_operation_msg.data = true;
   init_operation_pub.publish(init_operation_msg);
 
 	ros::spinOnce();
-
+  
   ROS_INFO("Setup OK");
 
   navfn.initialize("my_navfn_planner", &costmap);
@@ -916,7 +931,7 @@ int main(int argc, char** argv){
         std::tie(grad_msg.data, grad_mag_msg.data) = central_control.GradientDescentOrientationMag(robot_num);
         robot_grad_pub[robot_num].publish(grad_msg);
         robot_grad_mag_pub[robot_num].publish(grad_mag_msg);
-      
+
         pose_msg = central_control.CalculateRobotIdealPoseOnFormation(robot_num);
         pose_msg.header.stamp=ros::Time::now();
         pose_msg.header.frame_id="map";

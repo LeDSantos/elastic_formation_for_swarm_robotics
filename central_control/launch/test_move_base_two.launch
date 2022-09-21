@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+
+      <node pkg="map_server" name="map_server" type="map_server" args="$(find multiple_turtlebots_nav)/worlds/map_lab233.yaml" output="screen">
+        <param name="frame_id" value="map" />
+    </node>
+
+  <include file="$(find central_control)/launch/test_move_base_namespace.launch">
+  <arg name="robot_namespace" value="robot1" />
+  </include>
+
+  <!-- <include file="$(find turtlebot3_nps)/launch/move_base_namespace.launch">
+  <arg name="robot_namespace" value="tb3_1" />
+  </include> -->
+</launch>	

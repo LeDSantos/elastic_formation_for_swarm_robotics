@@ -18,6 +18,8 @@ geometry_msgs::Pose robot_pose, old_robot_on_formation, robot_on_formation;
 float grad_desc, grad_desc_mag;
 bool finished_operation;
 
+float initial_robot_orientation, initial_robot_x, initial_robot_y;
+
 #define DIST_MIN 0.15
 
 ///////////////////////////////////
@@ -28,6 +30,8 @@ bool finished_operation;
 
 void odom_callback(const nav_msgs::Odometry& msg){
 	robot_pose = msg.pose.pose;
+  robot_pose.position.x += initial_robot_x;
+  robot_pose.position.y += initial_robot_y;
 }
 
 void robot_on_formation_callback(const geometry_msgs::PoseStamped& msg){
@@ -58,7 +62,7 @@ class Robot{
     Robot(int n){
       name[5] += n;
       num = n;
-      vel_max = 0.4;
+      vel_max = 0.5;
 
       // weights
       mi_Bi = 0.65;
@@ -97,7 +101,7 @@ class Robot{
 void Robot::SetupVariables(){
   goal.target_pose.pose = robot_pose;
 
-  old_robot_orientation = ComputeYaw(robot_pose.orientation);
+  old_robot_orientation = constrainAngle(ComputeYaw(robot_pose.orientation) + initial_robot_orientation);
   old_robot_on_formation = robot_pose;
 
   float z_x, z_y;
@@ -132,7 +136,7 @@ bool Robot::UpdateGoalPosition(){
 
   ros::Time stamp_comum;
 
-  old_robot_orientation = ComputeYaw(robot_pose.orientation);
+  old_robot_orientation = constrainAngle(ComputeYaw(robot_pose.orientation) + initial_robot_orientation);
 
   float x_k, y_k; //robot actual position
 
@@ -189,7 +193,7 @@ bool Robot::UpdateGoalPosition(){
   test_goal_msg.request.goal = goal.target_pose;
 
   bool resul = ros::service::call(make_plan_topic, test_goal_msg);
-
+    
   return (test_goal_msg.response.plan.poses.size() > 0);
 }
 
@@ -216,6 +220,20 @@ int main(int argc, char** argv){
   }
 
   Robot robot(i);
+
+  initial_robot_x = 0.0;
+  if (n.searchParam("initial_robot_x", param_i)){
+    n.getParam(param_i, initial_robot_x);
+  }else{
+    ROS_WARN("No param 'initial_robot_x' found in an upward search");
+  }
+
+  initial_robot_y = 0.0;
+  if (n.searchParam("initial_robot_y", param_i)){
+    n.getParam(param_i, initial_robot_y);
+  }else{
+    ROS_WARN("No param 'initial_robot_y' found in an upward search");
+  }
 
   float dist_robot_goal=DIST_MIN + 1.0;
 
@@ -282,6 +300,9 @@ int main(int argc, char** argv){
 
   // Start algoritm
 
+  robot_pose.position.z = 0.0;
+  initial_robot_orientation = 0.0;
+
   robot.SetupVariables();
 
   ros::Duration(3.0).sleep();
@@ -289,7 +310,7 @@ int main(int argc, char** argv){
   int cont = 0;
 
 	while (ros::ok() && !finished_operation){
-		ros::spinOnce();
+		ros::spinOnce(); 
     if(robot.UpdateGoalPosition()){
       ac.sendGoal (robot.goal);
     }

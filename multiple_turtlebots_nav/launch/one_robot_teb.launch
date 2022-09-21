@@ -3,13 +3,13 @@
     <arg name="init_pose"/>
     <arg name="model" default="burger" doc="model type [burger, waffle, waffle_pi]"/>
 
-    <node name="spawn_minibot_model" pkg="gazebo_ros" type="spawn_model"
+    <!-- <node name="spawn_minibot_model" pkg="gazebo_ros" type="spawn_model"
      args="$(arg init_pose) -urdf -param /robot_description -model $(arg robot_name)"
-     respawn="false" output="screen" />
-
+     respawn="false" output="screen" /> -->
+    
     <node pkg="robot_state_publisher" type="robot_state_publisher"
-          name="robot_state_publisher" output="screen"/>    
-
+          name="robot_state_publisher" output="screen"/>   
+    
     <!-- amcl Arguments -->
   <arg name="scan_topic"     default="scan"/>
   <arg name="initial_pose_x" default="0.0"/>
@@ -26,7 +26,7 @@
   <arg name="move_forward_only" default="false"/>
 
   <!-- AMCL -->
-  <node pkg="amcl" type="amcl" name="amcl">
+  <node pkg="amcl" type="amcl" name="amcl" output="screen">
     <param name="min_particles"             value="500"/>
     <param name="max_particles"             value="3000"/>
     <param name="kld_err"                   value="0.02"/>
@@ -66,7 +66,7 @@
     <remap from="static_map" to="/static_map"/>
   </node>
 
-        <!-- move_base -->
+         <!-- move_base -->
       <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
         <!-- <param name="base_global_planner" value="navfn/NavfnROS"/> -->
         <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS"/>
@@ -77,7 +77,7 @@
         <rosparam file="$(find central_control)/param/costmap_common_params_$(arg model).yaml" command="load" ns="global_costmap" />
         <rosparam file="$(find central_control)/param/costmap_common_params_$(arg model).yaml" command="load" ns="local_costmap" />
 
-        <rosparam file="$(find turtlebot3_navigation)/param/global_costmap_params.yaml" command="load"/>
+        <rosparam file="$(find central_control)/param/global_costmap_params.yaml" command="load"/>
         <rosparam file="$(find central_control)/param/local_costmap_params.yaml" command="load"/>
 
         <remap from="cmd_vel" to="$(arg cmd_vel_topic)"/>

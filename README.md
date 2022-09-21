@@ -104,3 +104,25 @@ To save the map after mapping:
 ```sh
 rosrun map_server map_saver
 ```
+# For real tests
+
+Launch each turtlebot.
+
+<!-- PUT LAUNCH FILE -->
+
+Then config simulation_lab233.launch: put the init position taht was used in generated_robots_lab2332robots.launch at central_control.cpp (CONFIG_REAL_TEST) and in run_central_and2REALrobots.launch
+
+To start rviz:
+```sh
+roslaunch multiple_turtlebots_nav simulation_lab233.launch ## there are some rviz configs at src/multiple_turtlebots_nav/navigation
+```
+
+To start the metrics:
+```sh
+roslaunch metrics metrics.launch environment:="(.....)" ## THIS IS OPTIONAL
+```
+
+To start central control and 2 robots:
+```sh
+roslaunch central_control run_central_and2REALrobots.launch
+```
