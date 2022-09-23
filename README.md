@@ -49,8 +49,7 @@ $ git clone https://github.com/LeDSantos/elastic_formation_for_swarm_robotics.gi
 
 ## Execute the simulation
 
-Choose the simulation scenario (House or Columns) and the formation configurations at central_control.cpp and move_robot.cpp
-
+Choose the simulation scenario (House or Columns) and the formation configurations at central_control.cpp. You can also change configuration parameters of the individual robots at move_robot.cpp.
 
 ### Compile:
 
