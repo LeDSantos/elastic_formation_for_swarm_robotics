@@ -106,11 +106,46 @@ rosrun map_server map_saver
 ```
 # For real tests
 
-Launch each turtlebot.
+There is some useful information at https://emanual.robotis.com/docs/en/platform/turtlebot3/bringup/#bringup to launch just one robot, but we need to launch multiple robots with different namespaces.
 
-<!-- PUT LAUNCH FILE -->
+Run at the computer:
+```sh
+$ roscore
+```
 
-Then config simulation_lab233.launch: put the init position taht was used in generated_robots_lab2332robots.launch at central_control.cpp (CONFIG_REAL_TEST) and in run_central_and2REALrobots.launch
+**WARNING: there is a bug on the lidar driver. The instructions to fix it are here: https://github.com/ROBOTIS-GIT/ld08_driver/issues/1**
+
+Connect with the robots via ssh and modifiy the turtlebot3_robot.launch at the turtlebot3_bringup package to use robot1 or robot2 as the name:
+
+```html
+<launch>
+  <arg name="multi_robot_name" default="(robot1 or robot2)"/>
+  <arg name="set_lidar_frame_id" default="$(arg multi_robot_name)/base_scan"/>
+  <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+
+  <include file="$(find turtlebot3_bringup)/launch/turtlebot3_core.launch">
+    <arg name="multi_robot_name" value="$(arg multi_robot_name)"/>
+  </include>
+
+  <include file="$(find turtlebot3_bringup)/launch/turtlebot3_lidar.launch">
+    <arg name="set_frame_id" value="$(arg set_lidar_frame_id)"/>
+  </include>
+
+  <node pkg="turtlebot3_bringup" type="turtlebot3_diagnostics" name="turtlebot3_diagnostics" output="screen"/>
+
+  <group if = "$(eval model == 'waffle_pi')">
+    <include file="$(find turtlebot3_bringup)/launch/turtlebot3_rpicamera.launch"/>
+  </group>
+</launch>
+```
+Launch the bringup at each robot:
+```sh
+$ ROS_NAMESPACE=(robot1 or robot2) roslaunch turtlebot3_bringup turtlebot3_robot.launch
+```
+
+At the computer:
+
+**Configure simulation_lab233.launch:** put the init position that was used in generated_robots_lab2332robots.launch at central_control.cpp (CONFIG_REAL_TEST) and in run_central_and2REALrobots.launch. Compile the project after the modifications.
 
 To start rviz:
 ```sh
