@@ -1,6 +1,6 @@
 #include <central_control/central_control.h>
 
-//////////To move the formation
+// To move the formation
 #include <costmap_2d/costmap_2d_ros.h>
 #include <navfn/navfn_ros.h>
 #include <tf/tf.h>
@@ -15,7 +15,7 @@ typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseCl
 // #define COSTMAP_ON
 // #define PUB_POT_MAPS
 // #define FORMATION_STATE_DEBUG
-////////////////
+//
 
 /* To use a adaptation for robotics of the method proposed by R. Silveira, E. Prestes, and L. P. Nedel,
    “Managing coherent groups,” Computer Animation and Virtual Worlds, vol. 19, no. 3-4, pp. 295–305, 2008.*/
@@ -730,7 +730,7 @@ void Control::CreateFormationMapMsg(int robot_num){
     }
   }
 
-  // ROS_INFO("PUBLICANDO FORMATION %d", robot_num);
+  // ROS_INFO("PUBLISHING FORMATION %d", robot_num);
   formation_map[robot_num].header.stamp=ros::Time::now();
   formation_map[robot_num].header.frame_id="map";
   #endif
@@ -859,7 +859,7 @@ int main(int argc, char** argv){
   central_control.SetGoalPosition(-4.95, 3.2, 0, 3.14);
   // central_control.SetGoalPosition(-1, 1, 0, 0);
 
-  // // Ampulheta
+  // // Hourglass or Ampulheta
   // central_control.SetInitialStartPosition(1.0, -6.0, 0.0, 1.57);
   // // central_control.SetGoalPosition(-2.0, 3.0, 0.0, 1.57); /// lower room
   // central_control.SetGoalPosition(2.0, 3.0, 0.0, 1.57); /// upper room
