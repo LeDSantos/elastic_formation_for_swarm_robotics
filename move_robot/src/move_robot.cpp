@@ -124,7 +124,7 @@ std::tuple<float, float> Robot::CalculateForce_z(){
   return std::make_tuple(x, y);
 }
 
-///// Source: https://stackoverflow.com/questions/11498169/dealing-with-angle-wrap-in-c-code
+// Source: https://stackoverflow.com/questions/11498169/dealing-with-angle-wrap-in-c-code
 float constrainAngle(float x){
     float new_x = fmod(x + M_PI, 2.0 * M_PI);
     if (new_x < 0.0)

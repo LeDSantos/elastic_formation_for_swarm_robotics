@@ -1,5 +1,5 @@
 # elastic_formation_for_swarm_robotics
-Code of **Elastic Formations as Dynamic Boundaries for Potential Fields in Swarm Robotics**, paper submit to ICRA 2023 by Letícia dos Santos, Mathias Fassini Mantelli, Edson Prestes, Mariana Kolberg and Renan Maffei.
+Code of **Elastic Formation Control for Robot Swarms Using Dynamic Boundary-Based Potential Fields**, paper by Letícia dos Santos, Ulilé Indeque, Rafael Rache, Mathias Fassini Mantelli, Edson Prestes, Mariana Kolberg and Renan Maffei.
 
 [Video of a test with two real robots](https://youtu.be/39oOARJCpic)
 
