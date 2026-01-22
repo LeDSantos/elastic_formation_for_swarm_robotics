@@ -1,5 +1,5 @@
 # elastic_formation_for_swarm_robotics
-Code of **Elastic Formation Control for Robot Swarms Using Dynamic Boundary-Based Potential Fields**, paper by Letícia dos Santos, Ulilé Indeque, Rafael Rache, Mathias Fassini Mantelli, Edson Prestes, Mariana Kolberg and Renan Maffei.
+Code of **Elastic Formation Control for Robot Swarms Using Dynamic Boundary-Based Potential Fields**, paper by Letícia dos Santos, Ulilé Indeque, Rafael Rache, Mathias Fassini Mantelli, Edson Prestes, Mariana Kolberg, and Renan Maffei. Paper published in 2025 IEEE International Conference on Advanced Robotics (ICAR) and available [here](https://doi.org/10.1109/ICAR65334.2025.11338693).
 
 [Video of a test with two real robots](https://youtu.be/39oOARJCpic)
 
@@ -7,7 +7,7 @@ The real test code is in a branch.
 
 :robot: Any questions or problems with the code of this repository, please contact us by email: lsantos@inf.ufrgs.br
 
-## Install the dependences and packages
+## Install the dependencies and packages
 
 For the turtlebot3:
 
@@ -47,7 +47,7 @@ For teb:
 $ sudo apt-get install ros-noetic-teb-local-planner
 ```
 
-For the paper pakages:
+For the paper packages:
 ```sh
 $ cd ~/catkin_ws/src/
 $ git clone https://github.com/LeDSantos/elastic_formation_for_swarm_robotics.git
